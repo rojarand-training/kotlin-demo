@@ -1,4 +1,4 @@
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 sealed class TrafficLight
 data class GreenLight(val active: Boolean): TrafficLight()
