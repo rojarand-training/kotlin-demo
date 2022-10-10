@@ -14,6 +14,12 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.3.72")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
     testImplementation("org.junit.jupiter:junit-jupiter:5.5.2")
+    testImplementation("org.assertj:assertj-core:3.22.0")
+}
+
+tasks.test {
+    // Use the built-in JUnit support of Gradle.
+    useJUnitPlatform()
 }
 
 tasks {
