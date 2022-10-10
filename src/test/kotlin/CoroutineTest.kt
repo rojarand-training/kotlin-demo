@@ -122,3 +122,37 @@ class CoroutineTest {
     }
 
 }
+
+/*
+internal class SequentialJobQueue(private val lifecycle: Lifecycle) {
+
+    private val channel = Channel<Job>(capacity = Channel.UNLIMITED).apply {
+        lifecycle.coroutineScope.launch(Dispatchers.IO) {
+            consumeEach { it.join() }
+        }
+    }
+
+    fun enqueueJob(jobLogic: suspend (CoroutineScope) -> Unit) = channel.trySend(job(jobLogic))
+
+    fun scheduleJob(delay: Duration, jobLogic: suspend (CoroutineScope) -> Unit) {
+        lifecycle.coroutineScope.launch {
+            delay(delay.ms)
+            enqueueJob(jobLogic)
+        }
+    }
+
+    private fun job(block: suspend (CoroutineScope) -> Unit): Job {
+        /*
+        Lazy way of executing jobs allows to execute jobs sequentially. We want to modify temperatures
+        without concurrent access (sequentially) to avoid synchronization issues.
+        //https://stackoverflow.com/questions/56480520/kotlin-coroutines-sequential-execution
+        */
+        return lifecycle.coroutineScope.launch(
+            start = CoroutineStart.LAZY,
+            context = Dispatchers.IO
+        ) {
+            block(this)
+        }
+    }
+}
+*/
