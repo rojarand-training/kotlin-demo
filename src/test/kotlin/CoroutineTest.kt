@@ -9,8 +9,66 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.system.measureTimeMillis
 
+/**
+Coroutines scope
+Defines a scope for new coroutines. Every coroutine builder (like launch, async, etc.) is an extension on CoroutineScope
+and inherits its coroutineContext to automatically propagate all its elements and cancellation.
+
+class MyUIClass {
+    val scope = MainScope() // the scope of MyUIClass, uses Dispatchers.Main
+
+    fun destroy() { // destroys an instance of MyUIClass
+        scope.cancel() // cancels all coroutines launched in this scope
+    }
+    fun showSomeData() = scope.launch { // launched in the main thread
+           // ... here we can use suspending functions or coroutine builders with other dispatchers
+           draw(data) // draw in the main thread
+        }
+    }
+}
+
+- Coroutine scope and does not complete until all launched children complete.
+
+Builders: runBlocking, coroutineScope
+
+runBlocking and coroutineScope builders may look similar because they both wait for their body and all its children to complete.
+The main difference is that the runBlocking method blocks the current thread for waiting, while coroutineScope just suspends,
+releasing the underlying thread for other usages.
+
+*/
+
+/**
+A global CoroutineScope not bound to any job.
+Global scope is used to launch top-level coroutines which are operating on the whole application lifetime and are not cancelled prematurely.
+ *
+ * */
+
+/**
+Dispatchers:
+- Default dispatcher is used when no other dispatcher is explicitly specified in the scope. Uses a shared background pool of threads.
+
+- Main dispatcher is not confined to any specific thread. It executes initial continuation of the coroutine in the current call-frame and lets the coroutine resume in whatever thread that is used by the corresponding suspending function, without mandating any specific threading policy.
+Depending on platform and classpath, it can be mapped to different dispatchers:
+On JS and Native it is equivalent to the Default dispatcher.
+On JVM it is either the Android main thread dispatcher, JavaFx or Swing EDT dispatcher. It is chosen by the ServiceLoader.
+
+- IO dispatcher is designed for offloading blocking IO tasks to a shared pool of threads.
+
+- Unconfined dispatcher starts a coroutine in the caller thread, but only until the first suspension point.
+After suspension it resumes the coroutine in the thread that is fully determined by the suspending function that was invoked.
+
+launch(Dispatchers.Unconfined) { // not confined -- will work with main thread
+    println("Unconfined      : I'm working in thread ${Thread.currentThread().name}")
+    delay(500)
+    println("Unconfined      : After delay in thread ${Thread.currentThread().name}")
+}
+
+Unconfined      : I'm working in thread main
+Unconfined      : After delay in thread kotlinx.coroutines.DefaultExecutor
+*/
 
 class CoroutineTest {
+
 
     @DisplayName("When running coroutines with async")
     class AsyncTest {
